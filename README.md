@@ -1,2 +1,2 @@
 # gateway-1
-Team Members:
+Team Members: Dhrupa Patel, Sai kiran, Dhruvi, Sai Krishna, Hrishikesh
