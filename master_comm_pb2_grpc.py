@@ -12,7 +12,7 @@ class ReplicationStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc_protos.Channel.
+            channel: A grpc.Channel.
         """
         self.NewNodeUpdate = channel.unary_unary(
                 '/stream.Replication/NewNodeUpdate',

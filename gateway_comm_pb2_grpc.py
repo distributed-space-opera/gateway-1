@@ -12,12 +12,32 @@ class AuthenticateStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc_protos.Channel.
+            channel: A grpc.Channel.
         """
         self.Register = channel.unary_unary(
                 '/stream.Authenticate/Register',
                 request_serializer=gateway__comm__pb2.Request.SerializeToString,
                 response_deserializer=gateway__comm__pb2.Reply.FromString,
+                )
+        self.Login = channel.unary_unary(
+                '/stream.Authenticate/Login',
+                request_serializer=gateway__comm__pb2.Request.SerializeToString,
+                response_deserializer=gateway__comm__pb2.Reply.FromString,
+                )
+        self.GetNodeForUpload = channel.unary_unary(
+                '/stream.Authenticate/GetNodeForUpload',
+                request_serializer=gateway__comm__pb2.UploadRequest.SerializeToString,
+                response_deserializer=gateway__comm__pb2.UploadResponse.FromString,
+                )
+        self.GetNodeForDownload = channel.unary_unary(
+                '/stream.Authenticate/GetNodeForDownload',
+                request_serializer=gateway__comm__pb2.DownloadRequest.SerializeToString,
+                response_deserializer=gateway__comm__pb2.DownloadResponse.FromString,
+                )
+        self.ValidateToken = channel.unary_unary(
+                '/stream.Authenticate/ValidateToken',
+                request_serializer=gateway__comm__pb2.ValidateTokenRequest.SerializeToString,
+                response_deserializer=gateway__comm__pb2.ValidateTokenResponse.FromString,
                 )
 
 
@@ -25,7 +45,35 @@ class AuthenticateServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def Register(self, request, context):
+        """Methods for client and node
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Login(self, request, context):
         """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNodeForUpload(self, request, context):
+        """Methods required for client only
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetNodeForDownload(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ValidateToken(self, request, context):
+        """Methods required for node only
+        To validate client when a connection is to be established between node and client
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -37,6 +85,26 @@ def add_AuthenticateServicer_to_server(servicer, server):
                     servicer.Register,
                     request_deserializer=gateway__comm__pb2.Request.FromString,
                     response_serializer=gateway__comm__pb2.Reply.SerializeToString,
+            ),
+            'Login': grpc.unary_unary_rpc_method_handler(
+                    servicer.Login,
+                    request_deserializer=gateway__comm__pb2.Request.FromString,
+                    response_serializer=gateway__comm__pb2.Reply.SerializeToString,
+            ),
+            'GetNodeForUpload': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNodeForUpload,
+                    request_deserializer=gateway__comm__pb2.UploadRequest.FromString,
+                    response_serializer=gateway__comm__pb2.UploadResponse.SerializeToString,
+            ),
+            'GetNodeForDownload': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetNodeForDownload,
+                    request_deserializer=gateway__comm__pb2.DownloadRequest.FromString,
+                    response_serializer=gateway__comm__pb2.DownloadResponse.SerializeToString,
+            ),
+            'ValidateToken': grpc.unary_unary_rpc_method_handler(
+                    servicer.ValidateToken,
+                    request_deserializer=gateway__comm__pb2.ValidateTokenRequest.FromString,
+                    response_serializer=gateway__comm__pb2.ValidateTokenResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +130,73 @@ class Authenticate(object):
         return grpc.experimental.unary_unary(request, target, '/stream.Authenticate/Register',
             gateway__comm__pb2.Request.SerializeToString,
             gateway__comm__pb2.Reply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Login(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Authenticate/Login',
+            gateway__comm__pb2.Request.SerializeToString,
+            gateway__comm__pb2.Reply.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNodeForUpload(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Authenticate/GetNodeForUpload',
+            gateway__comm__pb2.UploadRequest.SerializeToString,
+            gateway__comm__pb2.UploadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetNodeForDownload(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Authenticate/GetNodeForDownload',
+            gateway__comm__pb2.DownloadRequest.SerializeToString,
+            gateway__comm__pb2.DownloadResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ValidateToken(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/stream.Authenticate/ValidateToken',
+            gateway__comm__pb2.ValidateTokenRequest.SerializeToString,
+            gateway__comm__pb2.ValidateTokenResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

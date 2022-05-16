@@ -14,12 +14,18 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12gateway-comm.proto\x12\x06stream\")\n\x07Request\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\"\x19\n\x05Reply\x12\x10\n\x08masterip\x18\x01 \x01(\t2<\n\x0c\x41uthenticate\x12,\n\x08Register\x12\x0f.stream.Request\x1a\r.stream.Reply\"\x00\x42\x16\n\x12org.gateway.protosP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x12gateway-comm.proto\x12\x06stream\"5\n\x07Request\x12\n\n\x02ip\x18\x01 \x01(\t\x12\x10\n\x08password\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\"\'\n\x05Reply\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"B\n\rUploadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x10\n\x08\x66ilesize\x18\x02 \x01(\x03\x12\r\n\x05token\x18\x03 \x01(\t\"1\n\x0eUploadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"2\n\x0f\x44ownloadRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"3\n\x10\x44ownloadResponse\x12\x0e\n\x06nodeip\x18\x01 \x01(\t\x12\x0f\n\x07message\x18\x02 \x01(\t\"8\n\x14ValidateTokenRequest\x12\x11\n\tclient_ip\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"(\n\x15ValidateTokenResponse\x12\x0f\n\x07message\x18\x01 \x01(\t2\xc7\x02\n\x0c\x41uthenticate\x12,\n\x08Register\x12\x0f.stream.Request\x1a\r.stream.Reply\"\x00\x12)\n\x05Login\x12\x0f.stream.Request\x1a\r.stream.Reply\"\x00\x12\x43\n\x10GetNodeForUpload\x12\x15.stream.UploadRequest\x1a\x16.stream.UploadResponse\"\x00\x12I\n\x12GetNodeForDownload\x12\x17.stream.DownloadRequest\x1a\x18.stream.DownloadResponse\"\x00\x12N\n\rValidateToken\x12\x1c.stream.ValidateTokenRequest\x1a\x1d.stream.ValidateTokenResponse\"\x00\x42\x16\n\x12org.gateway.protosP\x01\x62\x06proto3')
 
 
 
 _REQUEST = DESCRIPTOR.message_types_by_name['Request']
 _REPLY = DESCRIPTOR.message_types_by_name['Reply']
+_UPLOADREQUEST = DESCRIPTOR.message_types_by_name['UploadRequest']
+_UPLOADRESPONSE = DESCRIPTOR.message_types_by_name['UploadResponse']
+_DOWNLOADREQUEST = DESCRIPTOR.message_types_by_name['DownloadRequest']
+_DOWNLOADRESPONSE = DESCRIPTOR.message_types_by_name['DownloadResponse']
+_VALIDATETOKENREQUEST = DESCRIPTOR.message_types_by_name['ValidateTokenRequest']
+_VALIDATETOKENRESPONSE = DESCRIPTOR.message_types_by_name['ValidateTokenResponse']
 Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,), {
   'DESCRIPTOR' : _REQUEST,
   '__module__' : 'gateway_comm_pb2'
@@ -34,15 +40,69 @@ Reply = _reflection.GeneratedProtocolMessageType('Reply', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Reply)
 
+UploadRequest = _reflection.GeneratedProtocolMessageType('UploadRequest', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADREQUEST,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.UploadRequest)
+  })
+_sym_db.RegisterMessage(UploadRequest)
+
+UploadResponse = _reflection.GeneratedProtocolMessageType('UploadResponse', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADRESPONSE,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.UploadResponse)
+  })
+_sym_db.RegisterMessage(UploadResponse)
+
+DownloadRequest = _reflection.GeneratedProtocolMessageType('DownloadRequest', (_message.Message,), {
+  'DESCRIPTOR' : _DOWNLOADREQUEST,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.DownloadRequest)
+  })
+_sym_db.RegisterMessage(DownloadRequest)
+
+DownloadResponse = _reflection.GeneratedProtocolMessageType('DownloadResponse', (_message.Message,), {
+  'DESCRIPTOR' : _DOWNLOADRESPONSE,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.DownloadResponse)
+  })
+_sym_db.RegisterMessage(DownloadResponse)
+
+ValidateTokenRequest = _reflection.GeneratedProtocolMessageType('ValidateTokenRequest', (_message.Message,), {
+  'DESCRIPTOR' : _VALIDATETOKENREQUEST,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.ValidateTokenRequest)
+  })
+_sym_db.RegisterMessage(ValidateTokenRequest)
+
+ValidateTokenResponse = _reflection.GeneratedProtocolMessageType('ValidateTokenResponse', (_message.Message,), {
+  'DESCRIPTOR' : _VALIDATETOKENRESPONSE,
+  '__module__' : 'gateway_comm_pb2'
+  # @@protoc_insertion_point(class_scope:stream.ValidateTokenResponse)
+  })
+_sym_db.RegisterMessage(ValidateTokenResponse)
+
 _AUTHENTICATE = DESCRIPTOR.services_by_name['Authenticate']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022org.gateway.protosP\001'
   _REQUEST._serialized_start=30
-  _REQUEST._serialized_end=71
-  _REPLY._serialized_start=73
-  _REPLY._serialized_end=98
-  _AUTHENTICATE._serialized_start=100
-  _AUTHENTICATE._serialized_end=160
+  _REQUEST._serialized_end=83
+  _REPLY._serialized_start=85
+  _REPLY._serialized_end=124
+  _UPLOADREQUEST._serialized_start=126
+  _UPLOADREQUEST._serialized_end=192
+  _UPLOADRESPONSE._serialized_start=194
+  _UPLOADRESPONSE._serialized_end=243
+  _DOWNLOADREQUEST._serialized_start=245
+  _DOWNLOADREQUEST._serialized_end=295
+  _DOWNLOADRESPONSE._serialized_start=297
+  _DOWNLOADRESPONSE._serialized_end=348
+  _VALIDATETOKENREQUEST._serialized_start=350
+  _VALIDATETOKENREQUEST._serialized_end=406
+  _VALIDATETOKENRESPONSE._serialized_start=408
+  _VALIDATETOKENRESPONSE._serialized_end=448
+  _AUTHENTICATE._serialized_start=451
+  _AUTHENTICATE._serialized_end=778
 # @@protoc_insertion_point(module_scope)

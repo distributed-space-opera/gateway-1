@@ -12,7 +12,7 @@ class NodeReplicationStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc_protos.Channel.
+            channel: A grpc.Channel.
         """
         self.CreateReplica = channel.stream_unary(
                 '/stream.NodeReplication/CreateReplica',

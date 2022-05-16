@@ -12,7 +12,7 @@ class StreamingStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc_protos.Channel.
+            channel: A grpc.Channel.
         """
         self.UploadFile = channel.stream_unary(
                 '/stream.Streaming/UploadFile',
