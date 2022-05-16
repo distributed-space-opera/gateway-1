@@ -21,12 +21,12 @@ class GatewayService(AuthenticateServicer):
         print(ip)
         return Reply(message="m", token="")
 
-    def Register(self, ):
+    def Register(self, request, context):
         pass
 
     def GetNodeForDownload(self, request, context):
         authenticator = Authenticator()
-        authenticator.is_valid_token("")  # token goes here
+        is_valid_token("")  # token goes here
         pass
 
     def GetNodeForUpload(self, request, context):
