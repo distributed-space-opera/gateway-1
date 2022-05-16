@@ -7,18 +7,56 @@ option java_package = "org.gateway.protos";
 package stream;
 
 service Authenticate {
-
+  // Methods for client and node
   rpc Register (Request) returns (Reply) {}
+  rpc Login (Request) returns (Reply) {}
 
+  // Methods required for client only
+  rpc GetNodeForUpload(UploadRequest) returns (UploadResponse) {} // Will return the node ip to connect for upload
+  rpc GetNodeForDownload(DownloadRequest) returns (DownloadResponse) {} // Will return the node ip to connect for download
+
+  // Methods required for node only
+  // To validate client when a connection is to be established between node and client
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
 }
 
-// The request message containing the user's name.
 message Request {
-  string name = 1;
+  string ip = 1;
   string password = 2;
+  string type = 3; // NODE or CLIENT
 }
 
-// The response message containing the greetings
 message Reply {
-  string masterip = 1;
+  string message = 1; // Will return ERROR or SUCCESS
+  string token = 2; // Valid for 1 hour
+}
+
+message UploadRequest {
+  string filename = 1;
+  int64 filesize = 2; // in bytes
+  string token = 3;
+}
+
+message UploadResponse {
+  string nodeip = 1; // Will return the node information to connect with
+  string message = 2; // Will return ERROR or SUCCESS
+}
+
+message DownloadRequest{
+  string filename = 1;
+  string token = 2;
+}
+
+message DownloadResponse{
+  string nodeip = 1; // Will return the node information to connect with
+  string message = 2; // Will return ERROR or SUCCESS
+}
+
+message ValidateTokenRequest{
+  string client_ip = 1; // To validate the token against the client_ip
+  string token = 2; // Token given that client
+}
+
+message ValidateTokenResponse{
+  string message = 1; // returns VALID or INVALID
 }

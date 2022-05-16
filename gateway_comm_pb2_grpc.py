@@ -12,7 +12,7 @@ class AuthenticateStub(object):
         """Constructor.
 
         Args:
-            channel: A grpc.Channel.
+            channel: A grpc_protos.Channel.
         """
         self.Register = channel.unary_unary(
                 '/stream.Authenticate/Register',

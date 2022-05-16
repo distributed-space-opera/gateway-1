@@ -1,14 +1,7 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-import grpc
 import os
 import configparser
-import grpc.client_comm_pb2 as client_request
-import grpc.client_comm_pb2_grpc as client_service
-import grpc.master_comm_pb2 as master_request
-import grpc.master_comm_pb2_grpc as master_service
-import grpc.node_comm_pb2 as node_request
+import master_comm_pb2 as master_request
 
 app = Flask(__name__)
 
