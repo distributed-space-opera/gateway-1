@@ -1,36 +1,49 @@
-from flask import Flask
+import time
+from concurrent import futures
+
+import grpc
 import os
 import configparser
-import master_comm_pb2 as master_request
 
-app = Flask(__name__)
+import gateway_comm_pb2_grpc
+from gateway_comm_pb2 import Reply, Request
+from gateway_comm_pb2_grpc import AuthenticateServicer
+from authenticator import Authenticator
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 
 
-@app.route('/')
-def hello_world():  # put application's code here
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    app.config['SQLALCHEMY_DATABASE_URI'] = \
-        'sqlite:///' + os.path.join(basedir, 'database.db')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    return 'Hello World!'
+class GatewayService(AuthenticateServicer):
+    def Login(self, request, context):
+        ip = request.ip
+        password = request.password
+        print(ip)
+        return Reply(message="m", token="")
+
+    def Register(self, ):
+        pass
+
+    def GetNodeForDownload(self, request, context):
+        authenticator = Authenticator()
+        authenticator.is_valid_token("")  # token goes here
+        pass
+
+    def GetNodeForUpload(self, request, context):
+        pass
+
+    def ValidateToken(self, request, context):
+        pass
 
 
-@app.route('/upload')
-def uploadFile(filename, payload):
-    print("redirection to master's node to get nodeIP where data needs to be stored")
-    nodeIP = master_request.GetNodeForUploadRequest(filename)
-    return nodeIP
-
-
-@app.route('/download')
-def downloadFile(filename):
-    nodeIP = master_request.GetNodeForDownloadRequest(filename)
-    print("redirection to master's node to fetch IP address where filename is present")
-
-
-if __name__ == '__main__':
-    app.run()
-
+if __name__ == "__main__":
+    config = configparser.ConfigParser()
+    config.read(".ini")
+    prod_config = config["PROD"]
+    server_port = prod_config["GATEWAY_SERVER_PORT"]
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
+    gateway_comm_pb2_grpc.add_AuthenticateServicer_to_server(GatewayService(), server)
+    server.add_insecure_port("[::]:" + server_port)
+    print("Starting Gateway Server on port ", server_port, " ...")
+    server.start()
+    server.wait_for_termination()

@@ -1,4 +1,4 @@
-Flask
 grpcio
 grpcio-tools
 Flask-SQLAlchemy
+PyJWT
