@@ -23,7 +23,7 @@ def is_valid_token(token, client_ip):
         }
         jwt.decode(
             token,
-            "secret",
+            secret,
             algorithms=["HS256"]
         )
         return True
@@ -32,7 +32,7 @@ def is_valid_token(token, client_ip):
 
 
 def generate_token(data):
-    encoded = jwt.encode(data, "secret", algorithm="HS256")
+    encoded = jwt.encode(data, secret, algorithm="HS256")
     return encoded
 
 
