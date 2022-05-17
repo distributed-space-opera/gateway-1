@@ -9,8 +9,8 @@ from sqlalchemy import create_engine, MetaData, Table, Column, String
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
 prod_config = config["PROD"]
-private_key = prod_config["PRIVATE_KEY"]
-public_key = prod_config["PUBLIC_KEY"]
+# private_key = prod_config["PRIVATE_KEY"]
+# public_key = prod_config["PUBLIC_KEY"]
 secret = prod_config["JWT_SECRET"]
 
 
@@ -23,7 +23,7 @@ def is_valid_token(token, client_ip):
         }
         jwt.decode(
             token,
-            public_key,
+            "secret",
             algorithms=["HS256"]
         )
         return True
@@ -32,7 +32,7 @@ def is_valid_token(token, client_ip):
 
 
 def generate_token(data):
-    encoded = jwt.encode(data, private_key, algorithm="HS256")
+    encoded = jwt.encode(data, "secret", algorithm="HS256")
     return encoded
 
 
