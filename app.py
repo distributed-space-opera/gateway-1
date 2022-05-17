@@ -5,10 +5,9 @@ import time
 import grpc
 import sqlalchemy
 from sqlalchemy import Table, Column, String, create_engine, MetaData
-
 import gateway_comm_pb2_grpc
 from authenticator import is_valid_token, is_valid_password, generate_token
-from gateway_comm_pb2 import Reply, UploadResponse, DownloadResponse
+from gateway_comm_pb2 import Reply, UploadResponse, DownloadResponse, ValidateTokenResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
 from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest
 from master_comm_pb2_grpc import ReplicationServicer
@@ -37,7 +36,7 @@ def register(request, meta, engine, secret):
     conn = engine.connect()
     result = conn.execute(query)
     if result.first() is not None:
-        return Reply(message="Client/Node already registered", token=None)
+        return Reply(masterip=None, message="Client/Node already registered", token=None)
     query = sqlalchemy.insert(table).values(ip=request.ip, password=request.password)
     result = conn.execute(query)
     if result is not None:
@@ -46,8 +45,8 @@ def register(request, meta, engine, secret):
                 "requester": request.type,
                 "time": time.time()
             })
-        return Reply(message="Client/Node successfully registered", token=token)
-    return Reply(message="Client/Node failed to register", token=None)
+        return Reply(masterip=config["MASTER_NODE_IP"], message="Client/Node successfully registered", token=token)
+    return Reply(masterip=None, message="Client/Node failed to register", token=None)
 
 
 class GatewayService(AuthenticateServicer):
@@ -72,17 +71,17 @@ class GatewayService(AuthenticateServicer):
 
     def Register(self, request, context):
         if not validate_ip_address(request.ip):
-            return Reply(message="Invalid ip address. Please enter IPV4 address", token=None)
+            return Reply(master_ip=None, message="Invalid ip address. Please enter IPV4 address", token=None)
         if len(request.password) < 6 or len(request.password) > 20:
-            return Reply(message="Invalid password length. Length must be between 6 to 20", token=None)
+            return Reply(master_ip=None, message="Invalid password length. Length must be between 6 to 20", token=None)
         if request.type != "CLIENT" and request.type != "NODE":
-            return Reply(message="Type must be CLIENT/NODE", token=None)
+            return Reply(master_ip=None, message="Type must be CLIENT/NODE", token=None)
         config = configparser.ConfigParser()
         config.read(".ini")
         prod_config = config["PROD"]
         engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
         meta = MetaData()
-        return register(request, meta, engine, prod_config["SECRET"])
+        return register(request, meta, engine, prod_config["JWT_SECRET"])
 
     def GetNodeForDownload(self, request, context):
         if is_valid_token(request.token, request.client_ip):  # token goes here
@@ -113,6 +112,10 @@ class GatewayService(AuthenticateServicer):
         pass
 
     def ValidateToken(self, request, context):
+        if is_valid_token(request.token, request.client_ip):
+            return ValidateTokenResponse(message="VALID")
+        else:
+            return ValidateTokenResponse(message="INVALID")
         pass
 
 
