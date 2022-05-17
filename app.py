@@ -7,7 +7,7 @@ import configparser
 import gateway_comm_pb2_grpc
 from gateway_comm_pb2 import Reply, Request, UploadResponse, DownloadResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
-from authenticator import is_valid_token, is_valid_password
+from authenticator import is_valid_token, is_valid_password, generate_token
 from master_comm_pb2_grpc import ReplicationServicer
 from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest
 
@@ -23,11 +23,14 @@ class GatewayService(AuthenticateServicer):
         password = request.password
         # print(request)
         if is_valid_password(ip, password, requester_type):
-            # generate token
-            pass
+            token = generate_token({
+                    "ip": ip,
+                    "requester": requester_type,
+                    "time": time.time()
+                })
+            return Reply(master_ip=config["MASTER_NODE_IP"], message="SUCCESS", token=token)
         else:
-            pass
-        return Reply(message="m", token="")
+            return Reply(master_ip=None, message="ERROR", token="")
 
     def Register(self, request, context):
         pass
