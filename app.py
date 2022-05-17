@@ -15,7 +15,7 @@ class GatewayService(AuthenticateServicer):
         requester_type = request.type
         ip = request.ip
         password = request.password
-        print(request)
+        # print(request)
         if is_valid_password(ip, password, requester_type):
             # generate token
             pass
