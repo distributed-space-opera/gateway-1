@@ -1,10 +1,11 @@
 import configparser
 import os
 from datetime import datetime
-
+import bcrypt
 import jwt
 from jwt import InvalidSignatureError
 from sqlalchemy import create_engine, MetaData, Table, Column, String, text
+from passlib.hash import sha256_crypt
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
@@ -41,6 +42,7 @@ def generate_token(data):
 
 
 def is_valid_password(ip, password, requester):
+
     config = configparser.ConfigParser()
     config.read(".ini")
     prod_config = config["PROD"]
@@ -65,19 +67,20 @@ def is_valid_password(ip, password, requester):
     conn = engine.connect()
     result = conn.execute(query, ip=ip)
     value = result.first()
+    print("valuee ",value)
     try:
-        print(len(value))
-        return value[0] == password
+        print(len(value), password, value[0])
+        return decrypt(password,value[0])
 
     except:
         return False
 
 
-# TO DO
-def encrypt(message, salt):
-    pass
+def encrypt(password):
+    encrypted_password = sha256_crypt.encrypt(password)
+    return encrypted_password
 
 
-# TO DO
-def decrypt(password, ciphertext, salt):
-    pass
+def decrypt(password, ciphertext):
+    matched = sha256_crypt.verify(password, ciphertext)
+    return matched

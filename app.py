@@ -6,7 +6,7 @@ import grpc
 import sqlalchemy
 from sqlalchemy import Table, Column, String, create_engine, MetaData
 import gateway_comm_pb2_grpc
-from authenticator import is_valid_token, is_valid_password, generate_token
+from authenticator import is_valid_token, is_valid_password, generate_token, encrypt, decrypt
 from gateway_comm_pb2 import Reply, UploadResponse, DownloadResponse, ValidateTokenResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
 from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest, NewNodeUpdateRequest
@@ -23,7 +23,7 @@ def validate_ip_address(address):
     return True
 
 
-def register(self, request, meta, engine, secret):
+def register(request, meta, engine):
     prefix = "node"
     if request.type == "CLIENT":
         prefix = "client"
@@ -37,7 +37,7 @@ def register(self, request, meta, engine, secret):
     result = conn.execute(query)
     if result.first() is not None:
         return Reply(masterip=None, message="Client/Node already registered", token=None)
-    query = sqlalchemy.insert(table).values(ip=request.ip, password=request.password)
+    query = sqlalchemy.insert(table).values(ip=request.ip, password=encrypt(request.password))
     result = conn.execute(query)
     if result is not None:
         # Call master node and register new node
@@ -87,7 +87,7 @@ class GatewayService(AuthenticateServicer):
         prod_config = config["PROD"]
         engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
         meta = MetaData()
-        return register(request, meta, engine, prod_config["JWT_SECRET"])
+        return register(request, meta, engine)
 
 
     def GetNodeForDownload(self, request, context):
