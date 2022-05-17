@@ -1,10 +1,10 @@
-import time
-import jwt
 import configparser
 import os
-from sqlalchemy import create_engine, MetaData, Table, Column, String
+import time
 
+import jwt
 from jwt import InvalidSignatureError
+from sqlalchemy import create_engine, MetaData, Table, Column, String
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(".ini")))
@@ -12,6 +12,7 @@ prod_config = config["PROD"]
 private_key = prod_config["PRIVATE_KEY"]
 public_key = prod_config["PUBLIC_KEY"]
 secret = prod_config["JWT_SECRET"]
+
 
 def is_valid_token(token, client_ip):
     try:
@@ -36,7 +37,6 @@ def generate_token(data):
 
 
 def is_valid_password(ip, password, requester):
-
     config = configparser.ConfigParser()
     config.read(os.path.abspath(os.path.join(".ini")))
     db_uri = config["PROD"]["SQLALCHEMY_DATABASE_URI"]
@@ -65,3 +65,13 @@ def is_valid_password(ip, password, requester):
     result = conn.execute(query)
 
     return False
+
+
+# TO DO
+def encrypt(message, salt):
+    pass
+
+
+# TO DO
+def decrypt(password, ciphertext, salt):
+    pass
