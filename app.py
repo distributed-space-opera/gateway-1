@@ -41,7 +41,12 @@ def register(request, meta, engine, secret):
     query = sqlalchemy.insert(table).values(ip=request.ip, password=request.password)
     result = conn.execute(query)
     if result is not None:
-        return Reply(message="Client/Node successfully registered", token="")
+        token = generate_token({
+                "ip": request.ip,
+                "requester": request.type,
+                "time": time.time()
+            })
+        return Reply(message="Client/Node successfully registered", token=token)
     return Reply(message="Client/Node failed to register", token=None)
 
 
