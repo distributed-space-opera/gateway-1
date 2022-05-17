@@ -12,7 +12,15 @@ from authenticator import is_valid_token, is_valid_password
 
 class GatewayService(AuthenticateServicer):
     def Login(self, request, context):
+        requester_type = request.type
+        ip = request.ip
+        password = request.password
         print(request)
+        if is_valid_password(ip, password, requester_type):
+            # generate token
+            pass
+        else:
+            pass
         return Reply(message="m", token="")
 
     def Register(self, request, context):
@@ -37,8 +45,9 @@ if __name__ == "__main__":
     server_port = config["GATEWAY_SERVER_PORT"]
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
-    gateway_comm_pb2_grpc.add_AuthenticateServicer_to_server(GatewayService({1:2}), server)
+    gateway_comm_pb2_grpc.add_AuthenticateServicer_to_server(GatewayService(), server)
     server.add_insecure_port("[::]:" + server_port)
     print("Starting Gateway Server on port ", server_port, " ...")
+
     server.start()
     server.wait_for_termination()
