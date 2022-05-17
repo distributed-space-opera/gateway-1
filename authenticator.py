@@ -3,6 +3,7 @@ import jwt
 import configparser
 import os
 from sqlalchemy import create_engine, MetaData, Table, Column, String
+
 from jwt import InvalidSignatureError
 
 
@@ -25,9 +26,27 @@ def is_valid_token(token):
         return True
     except InvalidSignatureError:
         return False
-    return False
+
+
+def generate_token(data):
+    pass
 
 
 def is_valid_password(requestor_type="CLIENT"):
-    return False
+    config = configparser.ConfigParser()
+    config.read(os.path.abspath(os.path.join(".ini")))
+    db_uri = config["PROD"]
 
+    engine = create_engine(config[db_uri], echo=True)
+    meta = MetaData()
+
+    node_details = Table(
+        'node_details', meta,
+        Column('node_ip', String, primary_key=True),
+        Column('password', String),
+    )
+    query = node_details.select().where(node_details.c.node_ip == "")
+    conn = engine.connect()
+    result = conn.execute(query)
+
+    return False
