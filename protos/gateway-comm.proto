@@ -27,14 +27,16 @@ message Request {
 }
 
 message Reply {
-  string message = 1; // Will return ERROR or SUCCESS
-  string token = 2; // Valid for 1 hour
+  string masterip = 1;
+  string message = 2; // Will return ERROR or SUCCESS
+  string token = 3; // Valid for 1 hour
 }
 
 message UploadRequest {
-  string filename = 1;
-  int64 filesize = 2; // in bytes
-  string token = 3;
+  string client_ip = 1;
+  string filename = 2;
+  int64 filesize = 3; // in bytes
+  string token = 4;
 }
 
 message UploadResponse {
@@ -43,8 +45,9 @@ message UploadResponse {
 }
 
 message DownloadRequest{
-  string filename = 1;
-  string token = 2;
+  string client_ip = 1;
+  string filename = 2;
+  string token = 3;
 }
 
 message DownloadResponse{

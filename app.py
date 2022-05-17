@@ -5,12 +5,18 @@ import grpc
 import configparser
 
 import gateway_comm_pb2_grpc
-from gateway_comm_pb2 import Reply, Request
+from gateway_comm_pb2 import Reply, Request, UploadResponse, DownloadResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
 from authenticator import is_valid_token, is_valid_password
+from master_comm_pb2_grpc import ReplicationServicer
+from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest
 
 
 class GatewayService(AuthenticateServicer):
+
+    def __init__(self):
+        self.masterServicer = ReplicationServicer
+
     def Login(self, request, context):
         requester_type = request.type
         ip = request.ip
@@ -27,10 +33,31 @@ class GatewayService(AuthenticateServicer):
         pass
 
     def GetNodeForDownload(self, request, context):
-        is_valid_token("")  # token goes here
+        if is_valid_token(request.token, request.client_ip):  # token goes here
+            if request.filename:
+                print("getting Node IP where file is stored")
+                request_ip = GetNodeForDownloadRequest(request.filename)
+                node_ip = self.masterServicer.GetNodeForDownload(request_ip)
+                if node_ip:
+                    return DownloadResponse(nodeip=node_ip, message="SUCCESS")
+                else:
+                    return DownloadResponse(nodeip=None, message="ERROR")
+            else:
+                return DownloadResponse(nodeip=None, message="ERROR")
         pass
 
     def GetNodeForUpload(self, request, context):
+        if is_valid_token(request.token, request.client_ip):  # token goes here
+            if request.filename:
+                print("calling Master Node to get Node IP")
+                request_ip = GetNodeForUploadRequest(request.filename, request.filesize)
+                node_ip = self.masterServicer.GetNodeForUpload(request_ip)
+                if node_ip:
+                    return UploadResponse(nodeip=node_ip, message="SUCCESS")
+                else:
+                    return UploadResponse(nodeip=None, message="ERROR")
+            else:
+                return UploadResponse(nodeip=None, message="ERROR")
         pass
 
     def ValidateToken(self, request, context):
