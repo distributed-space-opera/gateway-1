@@ -1,7 +1,7 @@
 import configparser
 import re
 from concurrent import futures
-import time
+from datetime import datetime
 import grpc
 import sqlalchemy
 from sqlalchemy import Table, Column, String, create_engine, MetaData
@@ -48,7 +48,7 @@ def register(self, request, meta, engine, secret):
         token = generate_token({
                 "ip": request.ip,
                 "requester": request.type,
-                "time": time.time()
+                "time": datetime.now().isoformat()
             })
         return Reply(masterip=config["MASTER_NODE_IP"], message="Client/Node successfully registered", token=token)
     return Reply(masterip=None, message="Client/Node failed to register", token=None)
@@ -65,14 +65,15 @@ class GatewayService(AuthenticateServicer):
         password = request.password
         # print(request)
         if is_valid_password(ip, password, requester_type):
+            print("success")
             token = generate_token({
                 "ip": ip,
                 "requester": requester_type,
-                "time": time.time()
+                "time": datetime.now().isoformat()
             })
-            return Reply(master_ip=config["MASTER_NODE_IP"], message="SUCCESS", token=token)
+            return Reply(masterip=config["MASTER_NODE_IP"], message="SUCCESS", token=token)
         else:
-            return Reply(master_ip=None, message="ERROR", token="")
+            return Reply(masterip=None, message="ERROR", token="")
 
     def Register(self, request, context):
         if not validate_ip_address(request.ip):
