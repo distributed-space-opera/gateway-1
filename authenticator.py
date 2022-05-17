@@ -27,13 +27,18 @@ def is_valid_token(token, client_ip):
                 algorithms=["HS256"]
             )
         print("decoded: ", decoded)
+        # jwt.decode(
+        #     token,
+        #     secret,
+        #     algorithms=["HS256"]
+        # )
         return True
     except InvalidSignatureError:
         return False
 
 
 def generate_token(data):
-    encoded = jwt.encode(data, "secret", algorithm="HS256")
+    encoded = jwt.encode(data, secret, algorithm="HS256")
     return encoded
 
 

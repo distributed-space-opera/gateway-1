@@ -9,7 +9,7 @@ import gateway_comm_pb2_grpc
 from authenticator import is_valid_token, is_valid_password, generate_token
 from gateway_comm_pb2 import Reply, UploadResponse, DownloadResponse, ValidateTokenResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
-from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest
+from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest, NewNodeUpdateRequest
 from master_comm_pb2_grpc import ReplicationServicer
 
 
@@ -23,7 +23,7 @@ def validate_ip_address(address):
     return True
 
 
-def register(request, meta, engine, secret):
+def register(self, request, meta, engine, secret):
     prefix = "node"
     if request.type == "CLIENT":
         prefix = "client"
@@ -40,6 +40,11 @@ def register(request, meta, engine, secret):
     query = sqlalchemy.insert(table).values(ip=request.ip, password=request.password)
     result = conn.execute(query)
     if result is not None:
+        # Call master node and register new node
+        # request_ip = NewNodeUpdateRequest(request.newnodeip)
+        # response = self.masterServicer.NewNodeUpdate(request_ip)
+        # if response.status == "FAILURE":
+        #     return Reply(message="Client/Node failed to register on master node", token=None)
         token = generate_token({
                 "ip": request.ip,
                 "requester": request.type,
@@ -61,10 +66,10 @@ class GatewayService(AuthenticateServicer):
         # print(request)
         if is_valid_password(ip, password, requester_type):
             token = generate_token({
-                    "ip": ip,
-                    "requester": requester_type,
-                    "time": time.time()
-                })
+                "ip": ip,
+                "requester": requester_type,
+                "time": time.time()
+            })
             return Reply(master_ip=config["MASTER_NODE_IP"], message="SUCCESS", token=token)
         else:
             return Reply(master_ip=None, message="ERROR", token="")
@@ -82,6 +87,7 @@ class GatewayService(AuthenticateServicer):
         engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
         meta = MetaData()
         return register(request, meta, engine, prod_config["JWT_SECRET"])
+
 
     def GetNodeForDownload(self, request, context):
         if is_valid_token(request.token, request.client_ip):  # token goes here
