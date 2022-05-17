@@ -6,6 +6,12 @@ from sqlalchemy import create_engine, MetaData, Table, Column, String
 
 from jwt import InvalidSignatureError
 
+config = configparser.ConfigParser()
+config.read(os.path.abspath(os.path.join(".ini")))
+prod_config = config["PROD"]
+private_key = prod_config["PRIVATE_KEY"]
+public_key = prod_config["PUBLIC_KEY"]
+secret = prod_config["JWT_SECRET"]
 
 def is_valid_token(token, client_ip):
     try:
@@ -14,13 +20,9 @@ def is_valid_token(token, client_ip):
             "requester": "NODE",
             "time": time.time()
         }
-        config = configparser.ConfigParser()
-        config.read(os.path.abspath(os.path.join(".ini")))
-        prod_config = config["PROD"]
-        secret = prod_config["JWT_SECRET"]
         jwt.decode(
             token,
-            secret,
+            public_key,
             algorithms=["HS256"]
         )
         return True
@@ -29,7 +31,8 @@ def is_valid_token(token, client_ip):
 
 
 def generate_token(data):
-    pass
+    encoded = jwt.encode(data, private_key, algorithm="HS256")
+    return encoded
 
 
 def is_valid_password(ip, password, requester):
