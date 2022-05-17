@@ -7,10 +7,10 @@ from sqlalchemy import create_engine, MetaData, Table, Column, String
 from jwt import InvalidSignatureError
 
 
-def is_valid_token(token):
+def is_valid_token(token, client_ip):
     try:
         data = {
-            "ip": "10.0.0.1",
+            "ip": client_ip,
             "requester": "NODE",
             "time": time.time()
         }
