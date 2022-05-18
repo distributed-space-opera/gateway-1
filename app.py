@@ -10,7 +10,13 @@ from authenticator import is_valid_token, is_valid_password, generate_token, enc
 from gateway_comm_pb2 import Reply, UploadResponse, DownloadResponse, ValidateTokenResponse
 from gateway_comm_pb2_grpc import AuthenticateServicer
 from master_comm_pb2 import GetNodeForDownloadRequest, GetNodeForUploadRequest, NewNodeUpdateRequest
-from master_comm_pb2_grpc import ReplicationServicer
+from master_comm_pb2_grpc import ReplicationServicer, ReplicationStub
+
+
+class Master:
+    def __init__(self, master_ip):
+        self.channel = grpc.insecure_channel(master_ip)
+        self.master_stub = ReplicationStub(self.channel)
 
 # This function block will validate IP address format of node requesting to connect
 def validate_ip_address(address):
@@ -24,7 +30,7 @@ def validate_ip_address(address):
 
 
 # register function will add user details to database and notify master node if new node is added to network
-def register(request, meta, engine):
+def register(request, meta, engine, master):
     prefix = "node"
     if request.type == "CLIENT":
         prefix = "client"
@@ -37,29 +43,38 @@ def register(request, meta, engine):
     conn = engine.connect()
     result = conn.execute(query)
     if result.first() is not None:
-        return Reply(masterip=None, message="Client/Node already registered", token=None)
+        return Reply(masterip=None, message="ERROR", token=None)
     query = sqlalchemy.insert(table).values(ip=request.ip, password=encrypt(request.password))
     result = conn.execute(query)
+    print(result)
     if result is not None:
         # Call master node and register new node
-        request_ip = NewNodeUpdateRequest(request.ip)
-        response = ReplicationServicer.masterServicer.NewNodeUpdate(request_ip)
-        if response.status == "FAILURE":
-            return Reply(masterip=None, message="Client/Node failed to register on master node", token=None)
-        token = generate_token({
+        if prefix == "node":
+            request_ip = NewNodeUpdateRequest(newnodeip=request.ip)
+            response = master.master_stub.NewNodeUpdate(request_ip)
+            if response.status == "FAILURE":
+                return Reply(masterip=None, message="ERROR", token=None)
+            token = generate_token({
+                    "ip": request.ip,
+                    "requester": request.type,
+                    "time": datetime.now().isoformat()
+                })
+            return Reply(masterip=config["MASTER_NODE_IP"], message="SUCCESS", token=token)
+        else:
+            token = generate_token({
                 "ip": request.ip,
                 "requester": request.type,
                 "time": datetime.now().isoformat()
             })
-        return Reply(masterip=config["MASTER_NODE_IP"], message="Client/Node successfully registered", token=token)
-    return Reply(masterip=None, message="Client/Node failed to register", token=None)
+            return Reply(masterip=None, message="SUCCESS", token=token)
+    return Reply(masterip=None, message="ERROR", token=None)
 
 
 # A GatewayService Class which will provide a platform to communicate with internal network
 class GatewayService(AuthenticateServicer):
 
     def __init__(self):
-        self.masterServicer = ReplicationServicer
+        self.master = Master(config["MASTER_NODE_IP"])
 
     # Login function will authenticate and authorize user trying to access network
     def Login(self, request, context):
@@ -67,7 +82,7 @@ class GatewayService(AuthenticateServicer):
         Entry check to internal network
         Endpoint for Client node
         """
-
+        # client_ip = context.peer() # get client IP
         requester_type = request.type
         ip = request.ip
         password = request.password
@@ -86,10 +101,13 @@ class GatewayService(AuthenticateServicer):
         Registering to access the network to take responsibilities or access features
         Endpoint for Client and node
         """
-        if not validate_ip_address(request.ip):
-            return Reply(master_ip=None, message="Invalid ip address. Please enter IPV4 address", token=None)
-        if len(request.password) < 6 or len(request.password) > 20:
-            return Reply(master_ip=None, message="Invalid password length. Length must be between 6 to 20", token=None)
+        # client_ip = context.peer()   # get client IP
+        print(request, context.peer())
+        # if not validate_ip_address(request.ip):
+        #     print("ip not validated!")
+        #     return Reply(master_ip=None, message="Invalid ip address. Please enter IPV4 address", token=None)
+        # if len(request.password) < 6 or len(request.password) > 20:
+        #     return Reply(master_ip=None, message="Invalid password length. Length must be between 6 to 20", token=None)
         if request.type != "CLIENT" and request.type != "NODE":
             return Reply(master_ip=None, message="Type must be CLIENT/NODE", token=None)
         config = configparser.ConfigParser()
@@ -97,7 +115,8 @@ class GatewayService(AuthenticateServicer):
         prod_config = config["PROD"]
         engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
         meta = MetaData()
-        return register(request, meta, engine)
+        print("register")
+        return register(request, meta, engine, self.master)
 
     def GetNodeForDownload(self, request, context):
         """
@@ -107,10 +126,11 @@ class GatewayService(AuthenticateServicer):
         if is_valid_token(request.token, request.client_ip):
             if request.filename:
                 print("getting Node IP where file is stored")
-                request_ip = GetNodeForDownloadRequest(request.filename)
-                node_ip = self.masterServicer.GetNodeForDownload(request_ip)
-                if node_ip:
-                    return DownloadResponse(nodeip=node_ip, message="SUCCESS")
+                master = Master(config["MASTER_NODE_IP"])
+                request_ip = GetNodeForDownloadRequest(filename=request.filename)
+                response = self.master.masterStub.GetNodeForDownload(request_ip)
+                if response:
+                    return DownloadResponse(nodeip=response.nodeip, message="SUCCESS")
                 else:
                     return DownloadResponse(nodeip=None, message="ERROR")
             else:
@@ -125,10 +145,12 @@ class GatewayService(AuthenticateServicer):
         if is_valid_token(request.token, request.client_ip):  # token goes here
             if request.filename:
                 print("calling Master Node to get Node IP")
-                request_ip = GetNodeForUploadRequest(request.filename, request.filesize)
-                node_ip = self.masterServicer.GetNodeForUpload(request_ip)
-                if node_ip:
-                    return UploadResponse(nodeip=node_ip, message="SUCCESS")
+                request_ip = GetNodeForUploadRequest(filename=request.filename, filesize=request.filesize)
+                response = self.master.master_stub.GetNodeForUpload(request_ip)
+                print("response ", response)
+                if response:
+                    print("called response ", response)
+                    return UploadResponse(nodeip=response.nodeip, message="SUCCESS")
                 else:
                     return UploadResponse(nodeip=None, message="ERROR")
             else:

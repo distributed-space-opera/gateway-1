@@ -27,7 +27,7 @@ def is_valid_token(token, client_ip):
                 algorithms=["HS256"]
             )
         seconds = (datetime.now()-datetime.fromisoformat(decoded['time'])).seconds
-        if client_ip == decoded['ip'] and seconds<3600:
+        if client_ip == decoded['ip'] and seconds < 3600:
             return True
 
         return False
@@ -45,7 +45,7 @@ def generate_token(data):
 def is_valid_password(ip, password, requester):
     engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
     meta = MetaData()
-
+    print("requesterr", requester)
     # Database details
     node_details = Table(
         'node_details', meta,
@@ -83,4 +83,5 @@ def encrypt(password):
 # password stored in database.
 def decrypt(password, ciphertext):
     matched = sha256_crypt.verify(password, ciphertext)
+    print("matched", matched)
     return matched
