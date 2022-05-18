@@ -72,7 +72,6 @@ class AuthenticateServicer(object):
 
     def ValidateToken(self, request, context):
         """Methods required for node only
-        To validate client when a connection is to be established between node and client
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

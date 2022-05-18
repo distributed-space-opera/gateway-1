@@ -14,6 +14,7 @@ service Streaming {
 
 // The request message containing the user's name.
 message UploadFileRequest {
+  //  TODO add auth jwt token
   string filename = 1;
   bytes payload = 2;
   string token = 3;
@@ -25,12 +26,13 @@ message UploadFileReply {
 }
 
 message DownloadFileRequest {
+  //  TODO add auth jwt token
   string filename = 1;
   string token = 2;
 }
 
 // The response message containing the greetings
 message DownloadFileReply {
-  bytes payload = 1;
+  bytes payload = 2;
+  string error = 1;
 }
-

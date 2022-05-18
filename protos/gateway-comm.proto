@@ -16,7 +16,6 @@ service Authenticate {
   rpc GetNodeForDownload(DownloadRequest) returns (DownloadResponse) {} // Will return the node ip to connect for download
 
   // Methods required for node only
-  // To validate client when a connection is to be established between node and client
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) {}
 }
 
@@ -56,8 +55,8 @@ message DownloadResponse{
 }
 
 message ValidateTokenRequest{
-  string client_ip = 1; // To validate the token against the client_ip
-  string token = 2; // Token given that client
+  string client_ip = 1;
+  string token = 2;
 }
 
 message ValidateTokenResponse{

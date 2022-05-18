@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63lient-comm.proto\x12\x06stream\"E\n\x11UploadFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\x12\r\n\x05token\x18\x03 \x01(\t\"!\n\x0fUploadFileReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"6\n\x13\x44ownloadFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"$\n\x11\x44ownloadFileReply\x12\x0f\n\x07payload\x18\x01 \x01(\x0c\x32\x9d\x01\n\tStreaming\x12\x44\n\nUploadFile\x12\x19.stream.UploadFileRequest\x1a\x17.stream.UploadFileReply\"\x00(\x01\x12J\n\x0c\x44ownloadFile\x12\x1b.stream.DownloadFileRequest\x1a\x19.stream.DownloadFileReply\"\x00\x30\x01\x42\x15\n\x11org.client.protosP\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x11\x63lient-comm.proto\x12\x06stream\"E\n\x11UploadFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\x12\r\n\x05token\x18\x03 \x01(\t\"!\n\x0fUploadFileReply\x12\x0e\n\x06status\x18\x01 \x01(\t\"6\n\x13\x44ownloadFileRequest\x12\x10\n\x08\x66ilename\x18\x01 \x01(\t\x12\r\n\x05token\x18\x02 \x01(\t\"3\n\x11\x44ownloadFileReply\x12\x0f\n\x07payload\x18\x02 \x01(\x0c\x12\r\n\x05\x65rror\x18\x01 \x01(\t2\x9d\x01\n\tStreaming\x12\x44\n\nUploadFile\x12\x19.stream.UploadFileRequest\x1a\x17.stream.UploadFileReply\"\x00(\x01\x12J\n\x0c\x44ownloadFile\x12\x1b.stream.DownloadFileRequest\x1a\x19.stream.DownloadFileReply\"\x00\x30\x01\x42\x15\n\x11org.client.protosP\x01\x62\x06proto3')
 
 
 
@@ -62,7 +62,7 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _DOWNLOADFILEREQUEST._serialized_start=135
   _DOWNLOADFILEREQUEST._serialized_end=189
   _DOWNLOADFILEREPLY._serialized_start=191
-  _DOWNLOADFILEREPLY._serialized_end=227
-  _STREAMING._serialized_start=230
-  _STREAMING._serialized_end=387
+  _DOWNLOADFILEREPLY._serialized_end=242
+  _STREAMING._serialized_start=245
+  _STREAMING._serialized_end=402
 # @@protoc_insertion_point(module_scope)
