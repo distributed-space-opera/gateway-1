@@ -27,11 +27,17 @@ def is_valid_token(token, client_ip):
                 algorithms=["HS256"]
             )
         seconds = (datetime.now()-datetime.fromisoformat(decoded['time'])).seconds
-        if client_ip == decoded['ip'] and seconds < 3600:
+        print("validate token", decoded, seconds)
+        if seconds < 3600:
+            print("valid token")
             return True
-
-        return False
+        else:
+            return False
     except InvalidSignatureError:
+        print(InvalidSignatureError)
+        return False
+    except Exception as e:
+        print(e)
         return False
 
 
@@ -67,8 +73,8 @@ def is_valid_password(ip, password, requester):
     result = conn.execute(query, ip=ip)
     value = result.first()
     try:
-        print(len(value), password, value[0])
-        return decrypt(password, value[0])
+        print(len(value), password, value[1])
+        return decrypt(password, value[1])
     except:
         return False
 
