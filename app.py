@@ -119,6 +119,8 @@ class GatewayService(AuthenticateServicer):
         Endpoint for Client and node
         """
         # client_ip = context.peer()   # get client IP
+        if validate_ip_address(request.ip):
+            return Reply(master_ip=None, message="Invalid IP address", token=None)
         if len(request.password) < 6:
             return Reply(master_ip=None, message="Invalid password length. Length must be more than 6", token=None)
         if request.type != "CLIENT" and request.type != "NODE":
@@ -140,7 +142,7 @@ class GatewayService(AuthenticateServicer):
                 print("getting Node IP where file is stored", request)
                 request_ip = GetNodeForDownloadRequest(filename=request.filename)
                 response = self.master.master_stub.GetNodeForDownload(request_ip)
-                print("response", response)
+                print("returning Node IP from master's node for Download: ", response.nodeip)
                 if response:
                     return DownloadResponse(nodeip=response.nodeip, message="SUCCESS")
                 else:
@@ -159,6 +161,7 @@ class GatewayService(AuthenticateServicer):
                 print("calling Master Node to get Node IP", request)
                 request_ip = GetNodeForUploadRequest(filename=request.filename, filesize=request.filesize)
                 response = self.master.master_stub.GetNodeForUpload(request_ip)
+                print("returning Node IP from master's node for Upload: ", response.nodeip)
                 if response:
                     return UploadResponse(nodeip=response.nodeip, message="SUCCESS")
                 else:
