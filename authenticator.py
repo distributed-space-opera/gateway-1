@@ -27,17 +27,11 @@ def is_valid_token(token, client_ip):
                 algorithms=["HS256"]
             )
         seconds = (datetime.now()-datetime.fromisoformat(decoded['time'])).seconds
-        print("validate token", decoded, seconds)
-        if seconds < 3600:
-            print("valid token")
+        if client_ip == decoded['ip'] and seconds < 3600:
             return True
         else:
             return False
     except InvalidSignatureError:
-        print(InvalidSignatureError)
-        return False
-    except Exception as e:
-        print(e)
         return False
 
 
@@ -51,7 +45,6 @@ def generate_token(data):
 def is_valid_password(ip, password, requester):
     engine = create_engine(prod_config["SQLALCHEMY_DATABASE_URI"], echo=False)
     meta = MetaData()
-    print("requesterr", requester)
     # Database details
     node_details = Table(
         'node_details', meta,
@@ -73,8 +66,8 @@ def is_valid_password(ip, password, requester):
     result = conn.execute(query, ip=ip)
     value = result.first()
     try:
-        print(len(value), password, value[1])
-        return decrypt(password, value[1])
+        print("data found in database for node: ", ip, "having values: ", len(value))
+        return decrypt(password, value[0])
     except:
         return False
 
@@ -89,5 +82,4 @@ def encrypt(password):
 # password stored in database.
 def decrypt(password, ciphertext):
     matched = sha256_crypt.verify(password, ciphertext)
-    print("matched", matched)
     return matched
